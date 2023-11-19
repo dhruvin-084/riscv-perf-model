@@ -78,7 +78,7 @@ olympia::CoreTopologySimple::CoreTopologySimple(){
         },
         {
             "l2cache",
-            "cpu.core*",
+            "cpu",
             "L2 Cache Unit",
             sparta::TreeNode::GROUP_NAME_NONE,
             sparta::TreeNode::GROUP_IDX_NONE,
@@ -111,7 +111,7 @@ olympia::CoreTopologySimple::CoreTopologySimple(){
         },
         {
             "biu",
-            "cpu.core*",
+            "cpu",
             "Bus Interface Unit",
             sparta::TreeNode::GROUP_NAME_NONE,
             sparta::TreeNode::GROUP_IDX_NONE,
@@ -119,7 +119,7 @@ olympia::CoreTopologySimple::CoreTopologySimple(){
         },
         {
             "mss",
-            "cpu.core*",
+            "cpu",
             "Memory Sub-System",
             sparta::TreeNode::GROUP_NAME_NONE,
             sparta::TreeNode::GROUP_IDX_NONE,
@@ -209,21 +209,60 @@ olympia::CoreTopologySimple::CoreTopologySimple(){
             "cpu.core*.dcache.ports.out_lsu_free_req",
             "cpu.core*.lsu.ports.in_cache_free_req"
         },
+        // Udated ports
         {
-            "cpu.core*.dcache.ports.out_l2_req",
-            "cpu.core*.l2cache.ports.in_dl1_lookup_req"
+            "cpu.core0.ports.dcache.ports.out_biu_req",
+            "cpu.biu.ports.in_biu_req_0"
         },
         {
-            "cpu.core*.l2cache.ports.out_dl1_lookup_ack",
-            "cpu.core*.dcache.ports.in_l2_ack"
+            "cpu.core1.ports.dcache.ports.out_biu_req",
+            "cpu.biu.ports.in_biu_req_1"
         },
         {
-            "cpu.core*.l2cache.ports.out_biu_req",
-            "cpu.core*.biu.ports.in_biu_req"
+            "cpu.biu.ports.out_dl1_lookup_ack_0",
+            "cpu.core0.ports.dcache.ports.in_biu_ack"
         },
         {
-            "cpu.core*.biu.ports.out_biu_ack",
-            "cpu.core*.l2cache.ports.in_biu_ack"
+            "cpu.biu.ports.out_dl1_lookup_ack_1",
+            "cpu.core1.ports.dcache.ports.in_biu_ack"
+        },
+        {
+            "cpu.biu.ports.out_l2_lookup_req_0",
+            "cpu.l2cache.ports.in_biu_lookup_req_0"
+        },
+        {
+            "cpu.biu.ports.out_l2_lookup_req_1",
+            "cpu.l2cache.ports.in_biu_lookup_req_1"
+        },
+        {
+            "cpu.l2cache.ports.out_biu_lookup_ack_0",
+            "cpu.biu.ports.in_l2_lookup_ack_0"
+        },
+        {
+            "cpu.l2cache.ports.out_biu_lookup_ack_1",
+            "cpu.biu.ports.in_l2_lookup_ack_1"
+        },
+        {
+            "cpu.l2cache.ports.out_mss_req",
+            "cpu.mss.ports.in_mss_req"
+        },
+        {
+            "cpu.l2cache.ports.out_mss_req_sync",
+            "cpu.mss.ports.in_mss_req_sync"
+        },
+        {
+            "cpu.mss.ports.out_mss_req"
+            "cpu.l2cache.ports.in_mss_req",
+        },
+        {
+            "cpu.mss.ports.out_mss_req_sync"
+            "cpu.l2cache.ports.in_mss_req_sync",
+        },
+        
+        // Update end
+        {
+            "cpu.core*.rob.ports.out_retire_flush",
+            "cpu.core*.flushmanager.ports.in_retire_flush"
         },
         {
             "cpu.core*.lsu.ports.out_mmu_lookup_req",
@@ -241,18 +280,7 @@ olympia::CoreTopologySimple::CoreTopologySimple(){
             "cpu.core*.mmu.ports.out_lsu_free_req",
             "cpu.core*.lsu.ports.in_mmu_free_req"
         },
-        {
-            "cpu.core*.biu.ports.out_mss_req_sync",
-            "cpu.core*.mss.ports.in_mss_req_sync"
-        },
-        {
-            "cpu.core*.biu.ports.in_mss_ack_sync",
-            "cpu.core*.mss.ports.out_mss_ack_sync"
-        },
-        {
-            "cpu.core*.rob.ports.out_retire_flush",
-            "cpu.core*.flushmanager.ports.in_retire_flush"
-        },
+        
         {
             "cpu.core*.rob.ports.out_fetch_flush_redirect",
             "cpu.core*.flushmanager.ports.in_fetch_flush_redirect"
@@ -308,7 +336,7 @@ void olympia::CoreTopologySimple::bindTree(sparta::RootTreeNode* root_node)
         const std::string core_node = "cpu.core"+std::to_string(core_num);
         const auto dispatch_ports     = core_node + ".dispatch.ports";
         const auto flushmanager_ports = core_node + ".flushmanager.ports";
-
+        // execution_topology is number of alu, fp, br
         auto execution_topology =
             olympia::coreutils::getExecutionTopology(root_node->getChild(core_node));
         for (auto exe_unit_pair : execution_topology)

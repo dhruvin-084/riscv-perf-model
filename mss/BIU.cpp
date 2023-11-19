@@ -18,12 +18,18 @@ namespace olympia_mss
         biu_req_queue_size_(p->biu_req_queue_size),
         biu_latency_(p->biu_latency)
     {
-        in_biu_req_.registerConsumerHandler
-            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getReqFromLSU_, olympia::InstPtr));
+        in_biu_req_0_.registerConsumerHandler
+            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getReqFromDL1_, olympia::MemoryAccessInfoPtr));
+        
+        in_biu_req_1_.registerConsumerHandler
+            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getReqFromDL1_, olympia::MemoryAccessInfoPtr));
 
-        in_mss_ack_sync_.registerConsumerHandler
-            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getAckFromMSS_, bool));
-        in_mss_ack_sync_.setPortDelay(static_cast<sparta::Clock::Cycle>(1));
+        in_l2_lookup_ask_0_.registerConsumerHandler
+            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getAckFromL2_, olympia::MemoryAccessInfoPtr));
+        
+        in_l2_lookup_ask_1_.registerConsumerHandler
+            (CREATE_SPARTA_HANDLER_WITH_DATA(BIU, getAckFromL2_, olympia::MemoryAccessInfoPtr));
+        
 
 
         ILOG("BIU construct: #" << node->getGroupIdx());
@@ -38,9 +44,29 @@ namespace olympia_mss
     void BIU::getReqFromLSU_(const olympia::InstPtr & inst_ptr)
     {
         appendReqQueue_(inst_ptr);
+        std::cout << "getReqFromLSU - " << inst_ptr->getUniqueID() << std::endl;
 
         // Schedule BIU request handling event only when:
         // (1)BIU is not busy, and (2)Request queue is not empty
+        if (!biu_busy_) {
+            // NOTE:
+            // We could set this flag immediately here, but a better/cleaner way to do this is:
+            // (1)Schedule the handling event immediately;
+            // (2)Update flag in that event handler.
+
+            ev_handle_biu_req_.schedule(sparta::Clock::Cycle(0));
+            // NOTE:
+            // The handling event must be scheduled immediately (0 delay). Otherwise,
+            // BIU could potentially send another request to MSS before the busy flag is set
+        }
+        else {
+            ILOG("This request cannot be serviced right now, MSS is already busy!");
+        }
+    }
+
+    void BIU::getReqFromDL1_(const olympia::MemoryAccessInfoPtr & memAccessPtr){
+        appendReqQueue_(memAccessPtr->getInstPtr());
+        
         if (!biu_busy_) {
             // NOTE:
             // We could set this flag immediately here, but a better/cleaner way to do this is:
@@ -61,8 +87,8 @@ namespace olympia_mss
     void BIU::handle_BIU_Req_()
     {
         biu_busy_ = true;
-        out_mss_req_sync_.send(biu_req_queue_.front(), biu_latency_);
-
+        // out_mss_req_sync_.send(biu_req_queue_.front(), biu_latency_);
+        out_l2_lookup_req_0_.send({olympia::MemoryAccessInfoPtr()}, biu_latency_);
         ILOG("BIU request is sent to MSS!");
     }
 
@@ -89,6 +115,20 @@ namespace olympia_mss
             ev_handle_mss_ack_.schedule(sparta::Clock::Cycle(0));
 
             ILOG("MSS Ack is received!");
+
+            return;
+        }
+
+        // Right now we expect MSS ack is always true
+        sparta_assert(false, "MSS is NOT done!");
+    }
+
+    void BIU::getAckFromL2_(const olympia::MemoryAccessInfoPtr & memAccPtr)
+    {
+        if (memAccPtr) {
+            ev_handle_mss_ack_.schedule(sparta::Clock::Cycle(0));
+
+            ILOG("L2 Ack is received!");
 
             return;
         }

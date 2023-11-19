@@ -48,7 +48,7 @@ namespace olympia
             }
 
             // Parameters for ldst_inst_queue
-            PARAMETER(uint32_t, ldst_inst_queue_size, 8, "LSU ldst inst queue size")
+            PARAMETER(uint32_t, ldst_inst_queue_size, 64, "LSU ldst inst queue size")
         };
 
         /*!
@@ -393,7 +393,7 @@ namespace olympia
 
         // When simulation is ending (error or not), this function
         // will be called
-        void onStartingTeardown_() override {}
+        void onStartingTeardown_() override;
 
         friend class LSUTester;
 

@@ -15,7 +15,7 @@
 #include "Inst.hpp"
 #include "CoreTypes.hpp"
 #include "FlushManager.hpp"
-
+#include "MemoryAccessInfo.hpp"
 // UPDATE
 #include "sparta/ports/SyncPort.hpp"
 #include "sparta/resources/Pipe.hpp"
@@ -34,7 +34,7 @@ namespace olympia_mss
                 sparta::ParameterSet(n)
             { }
 
-            PARAMETER(uint32_t, biu_req_queue_size, 4, "BIU request queue size")
+            PARAMETER(uint32_t, biu_req_queue_size, 16, "BIU request queue size")
             PARAMETER(uint32_t, biu_latency, 1, "Send bus request latency")
         };
 
@@ -56,22 +56,43 @@ namespace olympia_mss
         // Input Ports
         ////////////////////////////////////////////////////////////////////////////////
 
-        sparta::DataInPort<olympia::InstQueue::value_type> in_biu_req_
-            {&unit_port_set_, "in_biu_req", 1};
+        sparta::DataInPort<olympia::InstQueue::value_type> in_biu_req_0_
+            {&unit_port_set_, "in_biu_req_0", 1};
+        
+        sparta::DataInPort<olympia::InstQueue::value_type> in_biu_req_1_
+            {&unit_port_set_, "in_biu_req_1", 1};
 
-        sparta::SyncInPort<bool> in_mss_ack_sync_
-            {&unit_port_set_, "in_mss_ack_sync", getClock()};
+
+        sparta::DataInPort<olympia::MemoryAccessInfoPtr> in_l2_lookup_ask_0_
+            {&unit_port_set_, "in_l2_lookup_ask_0", 0};
+        
+        sparta::DataInPort<olympia::MemoryAccessInfoPtr> in_l2_lookup_ask_1_
+            {&unit_port_set_, "in_l2_lookup_ask_1", 0};
+        
+        // sparta::SyncInPort<bool> in_mss_ack_sync_
+        //     {&unit_port_set_, "in_mss_ack_sync", getClock()};
 
 
         ////////////////////////////////////////////////////////////////////////////////
         // Output Ports
         ////////////////////////////////////////////////////////////////////////////////
+        
+        sparta::DataOutPort<olympia::MemoryAccessInfoPtr> out_dl1_lookup_ack_0_
+                {&unit_port_set_, "out_dl1_lookup_ack_0", 0};
+        
+        sparta::DataOutPort<olympia::MemoryAccessInfoPtr> out_dl1_lookup_ack_1_
+                {&unit_port_set_, "out_dl1_lookup_ack_1", 0};
 
         sparta::DataOutPort<olympia::InstPtr> out_biu_ack_
             {&unit_port_set_, "out_biu_ack"};
 
-        sparta::SyncOutPort<olympia::InstPtr> out_mss_req_sync_
-            {&unit_port_set_, "out_mss_req_sync", getClock()};
+        sparta::DataOutPort<olympia::MemoryAccessInfo> out_l2_lookup_req_0_
+            {&unit_port_set_, "out_l2_lookup_req_0", 0};
+
+        sparta::DataOutPort<olympia::MemoryAccessInfo> out_l2_lookup_req_1_
+            {&unit_port_set_, "out_l2_lookup_req_1", 0};
+        // sparta::SyncOutPort<olympia::InstPtr> out_mss_req_sync_
+        //     {&unit_port_set_, "out_mss_req_sync", getClock()};
 
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +128,8 @@ namespace olympia_mss
         // Receive new BIU request from LSU
         void getReqFromLSU_(const olympia::InstPtr &);
 
+        void getReqFromDL1_(const olympia::MemoryAccessInfoPtr &);
+
         // Handle BIU request
         void handle_BIU_Req_();
 
@@ -116,6 +139,8 @@ namespace olympia_mss
         // Receive MSS access acknowledge
         // Q: Does the argument list has to be "const DataType &" ?
         void getAckFromMSS_(const bool &);
+
+        void getAckFromL2_(const olympia::MemoryAccessInfoPtr &);
 
 
         ////////////////////////////////////////////////////////////////////////////////

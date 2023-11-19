@@ -19,7 +19,7 @@ namespace olympia {
 
             // Parameters for the DL1 cache
             PARAMETER(uint32_t, l1_line_size, 64, "DL1 line size (power of 2)")
-            PARAMETER(uint32_t, l1_size_kb, 32, "Size of DL1 in KB (power of 2)")
+            PARAMETER(uint32_t, l1_size_kb, 8, "Size of DL1 in KB (power of 2)")
             PARAMETER(uint32_t, l1_associativity, 8, "DL1 associativity (power of 2)")
             PARAMETER(uint32_t, cache_latency, 1, "Assumed latency of the memory system")
             PARAMETER(bool, l1_always_hit, false, "DL1 will always hit")
@@ -51,8 +51,8 @@ namespace olympia {
         sparta::DataInPort<MemoryAccessInfoPtr> in_lsu_lookup_req_
                 {&unit_port_set_, "in_lsu_lookup_req", 0};
 
-        sparta::DataInPort<MemoryAccessInfoPtr> in_l2_ack_
-                {&unit_port_set_, "in_l2_ack", 1};
+        sparta::DataInPort<MemoryAccessInfoPtr> in_biu_ack_
+                {&unit_port_set_, "in_biu_ack", 1};
 
         ////////////////////////////////////////////////////////////////////////////////
         // Output Ports
@@ -66,8 +66,8 @@ namespace olympia {
         sparta::DataOutPort<MemoryAccessInfoPtr> out_lsu_lookup_req_
                 {&unit_port_set_, "out_lsu_lookup_req", 1};
 
-        sparta::DataOutPort<MemoryAccessInfoPtr> out_l2_req_
-                {&unit_port_set_, "out_l2_req"};
+        sparta::DataOutPort<MemoryAccessInfoPtr> out_biu_req_
+                {&unit_port_set_, "out_biu_req"};
 
         ////////////////////////////////////////////////////////////////////////////////
         // Events

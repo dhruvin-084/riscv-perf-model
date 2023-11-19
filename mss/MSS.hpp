@@ -56,6 +56,9 @@ namespace olympia_mss
         sparta::SyncInPort<olympia::InstPtr> in_mss_req_sync_
             {&unit_port_set_, "in_mss_req_sync", getClock()};
 
+        sparta::DataInPort<olympia::InstPtr> in_mss_req_
+            {&unit_port_set_, "in_mss_req"};
+            
 
         ////////////////////////////////////////////////////////////////////////////////
         // Output Ports
@@ -63,6 +66,15 @@ namespace olympia_mss
 
         sparta::SyncOutPort<bool> out_mss_ack_sync_
             {&unit_port_set_, "out_mss_ack_sync", getClock()};
+
+        sparta::DataOutPort<olympia::InstPtr> out_mss_ack_
+            {&unit_port_set_, "out_mss_ack", 1};
+
+        // sparta::SyncOutPort<bool> out_mss_ack_sync0_
+        //     {&unit_port_set_, "out_mss_ack_sync0", getClock()};
+
+        // sparta::SyncOutPort<bool> out_mss_ack_sync1_
+        //     {&unit_port_set_, "out_mss_ack_sync1", getClock()};
 
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +92,11 @@ namespace olympia_mss
         sparta::UniqueEvent<> ev_handle_mss_req_
             {&unit_event_set_, "handle_mss_req", CREATE_SPARTA_HANDLER(MSS, handle_MSS_req_)};
 
+        // sparta::UniqueEvent<> ev_handle_mss_req0_
+        //     {&unit_event_set_, "handle_mss_req0", CREATE_SPARTA_HANDLER(MSS, handle_MSS_req0_)};
+
+        // sparta::UniqueEvent<> ev_handle_mss_req1_
+        //     {&unit_event_set_, "handle_mss_req1", CREATE_SPARTA_HANDLER(MSS, handle_MSS_req1_)};
 
         ////////////////////////////////////////////////////////////////////////////////
         // Callbacks
@@ -90,6 +107,8 @@ namespace olympia_mss
 
         // Handle MSS request
         void handle_MSS_req_();
+        // void handle_MSS_req0_();
+        // void handle_MSS_req1_();
 
 
         ////////////////////////////////////////////////////////////////////////////////

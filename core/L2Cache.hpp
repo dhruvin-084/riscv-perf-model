@@ -3,6 +3,7 @@
 #include "sparta/simulation/Unit.hpp"
 #include "sparta/ports/DataPort.hpp"
 #include "sparta/ports/SignalPort.hpp"
+#include "sparta/ports/SyncPort.hpp"
 #include "sparta/simulation/ParameterSet.hpp"
 #include "sparta/utils/LogUtils.hpp"
 #include "SimpleL2.hpp"
@@ -48,22 +49,43 @@ namespace olympia {
         ////////////////////////////////////////////////////////////////////////////////
         // Input Ports
         ////////////////////////////////////////////////////////////////////////////////
-        sparta::DataInPort<MemoryAccessInfoPtr> in_dl1_lookup_req_
-                {&unit_port_set_, "in_dl1_lookup_req", 0};
+        // sparta::DataInPort<MemoryAccessInfoPtr> in_dl1_lookup_req_
+        //         {&unit_port_set_, "in_dl1_lookup_req", 0};
 
-        sparta::DataInPort<InstPtr> in_biu_ack_
-                {&unit_port_set_, "in_biu_ack", 1};
+        // sparta::DataInPort<InstPtr> in_biu_ack_
+        //         {&unit_port_set_, "in_biu_ack", 1};
+        sparta::DataInPort<MemoryAccessInfoPtr> in_biu_lookup_req_0_
+                {&unit_port_set_, "in_biu_lookup_req_0", 0};
 
+        sparta::DataInPort<MemoryAccessInfoPtr> in_biu_lookup_req_1_
+                {&unit_port_set_, "in_biu_lookup_req_1", 0};
+
+        sparta::DataInPort<InstPtr> in_mss_ack_
+                {&unit_port_set_, "in_mss_ack", 1};
+        
+        sparta::SyncInPort<bool> in_mss_ack_sync_
+            {&unit_port_set_, "in_mss_ack_sync", getClock()};
         ////////////////////////////////////////////////////////////////////////////////
         // Output Ports
         ////////////////////////////////////////////////////////////////////////////////
 
-        sparta::DataOutPort<MemoryAccessInfoPtr> out_dl1_lookup_ack_
-                {&unit_port_set_, "out_dl1_lookup_ack", 0};
+        // sparta::DataOutPort<MemoryAccessInfoPtr> out_dl1_lookup_ack_
+        //         {&unit_port_set_, "out_dl1_lookup_ack", 0};
 
-        sparta::DataOutPort<InstPtr> out_biu_req_
-                {&unit_port_set_, "out_biu_req"};
+        // sparta::DataOutPort<InstPtr> out_biu_req_
+        //         {&unit_port_set_, "out_biu_req"};
+        
+        sparta::DataOutPort<MemoryAccessInfoPtr> out_biu_lookup_ack_0_
+                {&unit_port_set_, "out_dl1_lookup_ack_0", 0};
+                
+        sparta::DataOutPort<MemoryAccessInfoPtr> out_biu_lookup_ack_1_
+                {&unit_port_set_, "out_dl1_lookup_ack_1", 0};
 
+        sparta::DataOutPort<InstPtr> out_mss_req_
+                {&unit_port_set_, "out_mss_req"};
+        
+        sparta::SyncOutPort<olympia::InstPtr> out_mss_req_sync_
+            {&unit_port_set_, "out_mss_req_sync", getClock()};
         ////////////////////////////////////////////////////////////////////////////////
         // Events
         ////////////////////////////////////////////////////////////////////////////////
